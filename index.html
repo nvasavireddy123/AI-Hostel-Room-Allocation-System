@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>AI Hostel Room Allocation System</title>
+
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+    }
+
+    .container {
+        width: 95%;
+        max-width: 1000px;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 7px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 11px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 13px;
+        margin-top: 20px;
+        border: none;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    .reset {
+        background: #555;
+    }
+
+    .reset:hover {
+        background: #333;
+    }
+
+    #result {
+        margin-top: 30px;
+    }
+
+    .success {
+        background: #ecfdf5;
+        border-left: 5px solid green;
+        padding: 20px;
+        border-radius: 6px;
+    }
+
+    .error {
+        background: #fef2f2;
+        border-left: 5px solid red;
+        padding: 20px;
+        border-radius: 6px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 12px;
+        text-align: center;
+    }
+
+    th {
+        background: #2563eb;
+        color: white;
+    }
+
+    .available {
+        color: green;
+        font-weight: bold;
+    }
+
+    .full {
+        color: red;
+        font-weight: bold;
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="container">
+
+```
+<h1>🏨 AI Hostel Room Allocation System</h1>
+
+<p class="subtitle">
+    Automatically allocate a suitable hostel room based on student requirements.
+</p>
+
+
+<div class="form-section">
+
+    <h2>Student Details</h2>
+
+
+    <label>Student Name</label>
+
+    <input type="text"
+           id="studentName"
+           placeholder="Enter student name">
+
+
+    <label>Gender</label>
+
+    <select id="gender">
+
+        <option value="">
+            Select Gender
+        </option>
+
+        <option value="Male">
+            Male
+        </option>
+
+        <option value="Female">
+            Female
+        </option>
+
+    </select>
+
+
+    <label>Year</label>
+
+    <select id="year">
+
+        <option value="">
+            Select Year
+        </option>
+
+        <option value="1">
+            1st Year
+        </option>
+
+        <option value="2">
+            2nd Year
+        </option>
+
+        <option value="3">
+            3rd Year
+        </option>
+
+        <option value="4">
+            4th Year
+        </option>
+
+    </select>
+
+
+    <label>Department</label>
+
+    <select id="department">
+
+        <option value="">
+            Select Department
+        </option>
+
+        <option value="CSE">
+            CSE
+        </option>
+
+        <option value="ECE">
+            ECE
+        </option>
+
+        <option value="EEE">
+            EEE
+        </option>
+
+        <option value="MECH">
+            Mechanical
+        </option>
+
+        <option value="CIVIL">
+            Civil
+        </option>
+
+    </select>
+
+
+    <label>Preferred Room Type</label>
+
+    <select id="roomType">
+
+        <option value="">
+            Any Room Type
+        </option>
+
+        <option value="2">
+            2 Sharing
+        </option>
+
+        <option value="3">
+            3 Sharing
+        </option>
+
+        <option value="4">
+            4 Sharing
+        </option>
+
+    </select>
+
+
+    <button onclick="allocateRoom()">
+        🏠 Allocate Room
+    </button>
+
+    <button class="reset"
+            onclick="resetForm()">
+        Reset
+    </button>
+
+</div>
+
+
+<div id="result"></div>
+
+
+<h2>🏠 Hostel Room Status</h2>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>Room No</th>
+
+            <th>Gender</th>
+
+            <th>Room Type</th>
+
+            <th>Capacity</th>
+
+            <th>Occupied</th>
+
+            <th>Available</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody id="roomTable">
+
+    </tbody>
+
+</table>
+```
+
+</div>
+
+<script>
+
+
+/*
+    Hostel Room Data
+
+    capacity = maximum students
+    occupied = students already allocated
+*/
+
+var rooms = [
+
+    {
+        number: "A101",
+        gender: "Male",
+        type: 2,
+        capacity: 2,
+        occupied: 0
+    },
+
+    {
+        number: "A102",
+        gender: "Male",
+        type: 2,
+        capacity: 2,
+        occupied: 1
+    },
+
+    {
+        number: "A103",
+        gender: "Male",
+        type: 3,
+        capacity: 3,
+        occupied: 0
+    },
+
+    {
+        number: "A104",
+        gender: "Male",
+        type: 4,
+        capacity: 4,
+        occupied: 2
+    },
+
+    {
+        number: "A105",
+        gender: "Male",
+        type: 4,
+        capacity: 4,
+        occupied: 4
+    },
+
+    {
+        number: "B101",
+        gender: "Female",
+        type: 2,
+        capacity: 2,
+        occupied: 0
+    },
+
+    {
+        number: "B102",
+        gender: "Female",
+        type: 2,
+        capacity: 2,
+        occupied: 1
+    },
+
+    {
+        number: "B103",
+        gender: "Female",
+        type: 3,
+        capacity: 3,
+        occupied: 0
+    },
+
+    {
+        number: "B104",
+        gender: "Female",
+        type: 4,
+        capacity: 4,
+        occupied: 2
+    },
+
+    {
+        number: "B105",
+        gender: "Female",
+        type: 4,
+        capacity: 4,
+        occupied: 4
+    }
+
+];
+
+
+
+/*
+    Display room information
+*/
+
+function displayRooms() {
+
+    var table =
+        document.getElementById("roomTable");
+
+    table.innerHTML = "";
+
+
+    for (var i = 0; i < rooms.length; i++) {
+
+        var room = rooms[i];
+
+        var available =
+            room.capacity - room.occupied;
+
+
+        var statusClass =
+            available > 0
+            ? "available"
+            : "full";
+
+
+        var row =
+            "<tr>" +
+
+            "<td>" +
+            room.number +
+            "</td>" +
+
+            "<td>" +
+            room.gender +
+            "</td>" +
+
+            "<td>" +
+            room.type +
+            " Sharing" +
+            "</td>" +
+
+            "<td>" +
+            room.capacity +
+            "</td>" +
+
+            "<td>" +
+            room.occupied +
+            "</td>" +
+
+            "<td class='" +
+            statusClass +
+            "'>" +
+            available +
+            "</td>" +
+
+            "</tr>";
+
+
+        table.innerHTML += row;
+
+    }
+
+}
+
+
+
+/*
+    AI Room Allocation
+*/
+
+function allocateRoom() {
+
+
+    var name =
+        document.getElementById("studentName").value.trim();
+
+
+    var gender =
+        document.getElementById("gender").value;
+
+
+    var year =
+        document.getElementById("year").value;
+
+
+    var department =
+        document.getElementById("department").value;
+
+
+    var preferredType =
+        document.getElementById("roomType").value;
+
+
+    var result =
+        document.getElementById("result");
+
+
+    /*
+        Check required fields
+    */
+
+    if (
+        name === "" ||
+        gender === "" ||
+        year === "" ||
+        department === ""
+    ) {
+
+        result.innerHTML =
+
+            "<div class='error'>" +
+
+            "<h3>⚠️ Please enter all student details.</h3>" +
+
+            "<p>Name, gender, year and department are required.</p>" +
+
+            "</div>";
+
+        return;
+
+    }
+
+
+    /*
+        Find suitable rooms
+    */
+
+    var suitableRooms = [];
+
+
+    for (var i = 0; i < rooms.length; i++) {
+
+        var room = rooms[i];
+
+
+        var available =
+            room.capacity - room.occupied;
+
+
+        /*
+            Constraint 1:
+            Gender must match
+        */
+
+        if (room.gender !== gender) {
+            continue;
+        }
+
+
+        /*
+            Constraint 2:
+            Room must have space
+        */
+
+        if (available <= 0) {
+            continue;
+        }
+
+
+        /*
+            Constraint 3:
+            If student selected a room type,
+            it should match
+        */
+
+        if (
+            preferredType !== "" &&
+            room.type !== Number(preferredType)
+        ) {
+            continue;
+        }
+
+
+        suitableRooms.push(room);
+
+    }
+
+
+    /*
+        No suitable room
+    */
+
+    if (suitableRooms.length === 0) {
+
+        result.innerHTML =
+
+            "<div class='error'>" +
+
+            "<h3>❌ No Suitable Room Available</h3>" +
+
+            "<p>Try selecting another room type.</p>" +
+
+            "</div>";
+
+        return;
+
+    }
+
+
+    /*
+        AI Scoring
+
+        The system gives preference to:
+        1. Preferred room type
+        2. Room with fewer students
+    */
+
+    suitableRooms.sort(function(a, b) {
+
+        var scoreA = 0;
+
+        var scoreB = 0;
+
+
+        if (
+            preferredType !== "" &&
+            a.type === Number(preferredType)
+        ) {
+            scoreA += 10;
+        }
+
+
+        if (
+            preferredType !== "" &&
+            b.type === Number(preferredType)
+        ) {
+            scoreB += 10;
+        }
+
+
+        /*
+            Prefer rooms with more available space
+        */
+
+        scoreA +=
+            (a.capacity - a.occupied);
+
+
+        scoreB +=
+            (b.capacity - b.occupied);
+
+
+        return scoreB - scoreA;
+
+    });
+
+
+    /*
+        Select best room
+    */
+
+    var selectedRoom =
+        suitableRooms[0];
+
+
+    /*
+        Allocate student
+    */
+
+    selectedRoom.occupied++;
+
+
+    /*
+        Display allocation result
+    */
+
+    result.innerHTML =
+
+        "<div class='success'>" +
+
+        "<h2>✅ Room Allocated Successfully</h2>" +
+
+        "<p><b>Student Name:</b> " +
+        name +
+        "</p>" +
+
+        "<p><b>Gender:</b> " +
+        gender +
+        "</p>" +
+
+        "<p><b>Year:</b> " +
+        year +
+        "</p>" +
+
+        "<p><b>Department:</b> " +
+        department +
+        "</p>" +
+
+        "<p><b>Allocated Room:</b> " +
+        selectedRoom.number +
+        "</p>" +
+
+        "<p><b>Room Type:</b> " +
+        selectedRoom.type +
+        " Sharing</p>" +
+
+        "<p><b>Available Beds:</b> " +
+        (selectedRoom.capacity -
+         selectedRoom.occupied) +
+        "</p>" +
+
+        "<p><b>AI Decision:</b> " +
+        "Room selected based on gender, availability and room preference.</p>" +
+
+        "</div>";
+
+
+    /*
+        Update room table
+    */
+
+    displayRooms();
+
+}
+
+
+
+/*
+    Reset form
+*/
+
+function resetForm() {
+
+    document.getElementById("studentName").value = "";
+
+    document.getElementById("gender").value = "";
+
+    document.getElementById("year").value = "";
+
+    document.getElementById("department").value = "";
+
+    document.getElementById("roomType").value = "";
+
+    document.getElementById("result").innerHTML = "";
+
+}
+
+
+
+/*
+    Display rooms when page loads
+*/
+
+displayRooms();
+
+
+</script>
+
+</body>
+
+</html>
